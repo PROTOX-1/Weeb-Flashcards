@@ -22,7 +22,7 @@ Weeb Flashcards is a beginner-friendly desktop flashcard app made using Electron
 - HTML, CSS, JavaScript
 
 ---
-[# Release](https://github.com/PROTOX-1/Weeb-Flashcards/releases)
+[## Release](https://github.com/PROTOX-1/Weeb-Flashcards/releases)
 
 ##  How to Run the App (Development)
 
