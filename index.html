@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Weeb Flashcards Pro</title>
+  <style>
+    body {
+      background: #1a1a2e;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .flashcard {
+      background: #292949;
+      border: 2px solid #aaa;
+      border-radius: 15px;
+      width: 320px;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 1.2rem;
+      padding: 20px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      margin-bottom: 10px;
+    }
+
+    .flashcard:hover {
+      transform: scale(1.05);
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: #ccc;
+      margin-bottom: 20px;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 10px 15px;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      background-color: #ff5f5f;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #e94e4e;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    input {
+      padding: 8px;
+      border-radius: 6px;
+      border: none;
+      font-size: 1rem;
+    }
+
+    .fav {
+      background-color: #ffb347;
+    }
+
+    .mode-toggle {
+      background-color: #5fafff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="flashcard" id="flashcard">Click to Reveal Meaning</div>
+  <div class="subtitle" id="subtitle">Japanese Phrase</div>
+
+  <div class="buttons">
+    <button onclick="prevCard()">◀ Prev</button>
+    <button onclick="flipCard()">🔄 Flip</button>
+    <button onclick="nextCard()">Next ▶</button>
+    <button onclick="shuffleCards()">🔀 Shuffle</button>
+    <button class="fav" onclick="toggleFavorite()">⭐ Favorite</button>
+    <button onclick="exportFavorites()">📁 Export</button>
+    <button class="mode-toggle" onclick="toggleMode()">🌓 Mode</button>
+  </div>
+
+  <div class="input-group">
+    <input type="text" id="searchBox" placeholder="Search phrase..." oninput="searchCard()">
+  </div>
+
+  <script>
+    const cards = [
+      { jp: "Nani?! (何?!)", en: "What?!" },
+      { jp: "Omae wa mou shindeiru. (お前はもう死んでいる)", en: "You are already dead." },
+      { jp: "Yamete kudasai! (やめてください)", en: "Please stop!" },
+      { jp: "Baka! (バカ)", en: "Idiot!" },
+      { jp: "Ara ara~ (あらあら〜)", en: "Oh my~" },
+      { jp: "Itadakimasu! (いただきます)", en: "Let's eat!" },
+      { jp: "Tasukete! (助けて!)", en: "Help me!" },
+      { jp: "Sugoi! (すごい)", en: "Amazing!" },
+      { jp: "Kawaii~ (かわいい)", en: "Cute~" },
+      { jp: "Daijoubu? (大丈夫?)", en: "Are you okay?" },
+      { jp: "Ganbatte! (頑張って!)", en: "Do your best!" },
+      { jp: "Nyaa~ (にゃー)", en: "Meow~" },
+      { jp: "Onii-chan! (お兄ちゃん)", en: "Big brother!" },
+      { jp: "Yare yare daze... (やれやれだぜ)", en: "Good grief..." },
+      { jp: "Ore wa... (俺は...)", en: "I am..." }
+      { jp: "Kimochi warui... (気持ち悪い)", en: "Disgusting..." },
+      { jp: "Kawaii ne! (かわいいね！)", en: "Isn't it cute?" },
+      { jp: "Suki! (好き！)", en: "I like" },
+      { jp: "Aishiteru! (愛してる！)", en: "I love you!"},
+    ];
+
+    let currentIndex = 0;
+    let flipped = false;
+    let favorites = [];
+    let darkMode = true;
+
+    const flashcard = document.getElementById('flashcard');
+    const subtitle = document.getElementById('subtitle');
+
+    function updateCard() {
+      flashcard.innerText = cards[currentIndex].jp;
+      subtitle.innerText = "Japanese Phrase";
+      flipped = false;
+    }
+
+    function flipCard() {
+      if (!flipped) {
+        flashcard.innerText = cards[currentIndex].en;
+        subtitle.innerText = "Meaning (English)";
+      } else {
+        flashcard.innerText = cards[currentIndex].jp;
+        subtitle.innerText = "Japanese Phrase";
+      }
+      flipped = !flipped;
+    }
+
+    function nextCard() {
+      currentIndex = (currentIndex + 1) % cards.length;
+      updateCard();
+    }
+
+    function prevCard() {
+      currentIndex = (currentIndex - 1 + cards.length) % cards.length;
+      updateCard();
+    }
+
+    function shuffleCards() {
+      cards.sort(() => Math.random() - 0.5);
+      currentIndex = 0;
+      updateCard();
+    }
+
+    function toggleFavorite() {
+      const current = cards[currentIndex];
+      if (!favorites.includes(current)) {
+        favorites.push(current);
+        alert("Added to favorites!");
+      } else {
+        alert("Already in favorites!");
+      }
+    }
+
+    function exportFavorites() {
+      const data = favorites.map(f => `${f.jp} = ${f.en}`).join('\n');
+      const blob = new Blob([data], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.download = "weeb_favorites.txt";
+      link.href = url;
+      link.click();
+    }
+
+    function searchCard() {
+      const term = document.getElementById('searchBox').value.toLowerCase();
+      const index = cards.findIndex(c => c.jp.toLowerCase().includes(term) || c.en.toLowerCase().includes(term));
+      if (index !== -1) {
+        currentIndex = index;
+        updateCard();
+      }
+    }
+
+    function toggleMode() {
+      darkMode = !darkMode;
+      document.body.style.background = darkMode ? "#1a1a2e" : "#ffffff";
+      document.body.style.color = darkMode ? "white" : "black";
+      flashcard.style.background = darkMode ? "#292949" : "#eee";
+    }
+
+    // Initial card
+    updateCard();
+  </script>
+</body>
+</html>
